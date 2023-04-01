@@ -1,8 +1,8 @@
 ﻿#include <iostream>
 #include <locale>
 #include <string>
-#include <Windows.h>
 #include <regex>
+#define testfunc
 
 using namespace std;
 
@@ -12,6 +12,7 @@ private:
     string name;
     string surname;
     string title;
+
 public:
     void setName(string n)
     {
@@ -42,16 +43,24 @@ public:
 class book : public creauthor
 {
 private:
-    string year;
+    int year{ 0 };
 public:
-    void setYear(string y)
-    {
-        year = y;
-    }
-    string getYear()
-    {
+    int setYear(int y) {
+        int error_current{ 0 };
+        if (y <= 2014 || y > 2023) {
+            error_current = -1;
+        }
+        else
+        {
+            error_current = 0;
+            year = y;
+        };
+        return error_current;
+    };
+    int getYear() {
         return year;
-    }
+    };
+
 };
 
 class author : public creauthor
@@ -59,9 +68,19 @@ class author : public creauthor
 private:
     string date;
 public:
-    void setDate(string dt)
+    int setDate(string dt)
     {
-        date = dt;
+        int error_current{ 0 };
+        smatch n;
+        if (regex_search(dt, n, regex(R"(^\b[0-2]\d{3}\b-\b[0-1]\d\b-\b[0-3]\d\b$)"))) {
+            error_current = 0;
+            date = dt;
+
+        }
+        else {
+            error_current = -3;
+        }
+        return error_current;
     }
     string getDate()
     {
@@ -69,43 +88,105 @@ public:
     }
 };
 
+void testingsetDate(author object) {
+    string dt="2005-12-12";
+    if (object.setDate(dt) == 0) {
+        cerr << dt << " good" << endl;
+    }
+    else
+    {
+        cerr << dt << " failed" << endl;
+    }
+    dt = "1994.12.31";
+    if (object.setDate(dt) == 0) {
+        cerr << dt << " good" << endl;
+    }
+    else
+    {
+        cerr << dt << " failed" << endl;
+    }
+    dt = "12-12-2005";
+    if (object.setDate(dt) == 0) {
+        cerr << dt << " good" << endl;
+    }
+    else
+    {
+        cerr << dt << " failed" << endl;
+    }
+    dt = "2973-12-31";
+    if (object.setDate(dt) == 0) {
+        cerr << dt << " good" << endl;
+    }
+    else
+    {
+        cerr << dt << " failed" << endl;
+    }
+    dt = "2005-31-12";
+    if (object.setDate(dt) == 0) {
+        cerr << dt << " good" << endl;
+    }
+    else
+    {
+        cerr << dt << " failed" << endl;
+    }
+    dt = "2005-12-39";
+    if (object.setDate(dt) == 0) {
+        cerr << dt << " good" << endl;
+    }
+    else
+    {
+        cerr << dt << " failed" << endl;
+    }
+};
+
+void testingsetYear(book object1) {
+    int y = 2015;
+    if (object1.setYear(y) == 0) {
+        cerr << "" << y << " good" << endl;
+    }
+    else
+    {
+        cerr << "" << y << " failed" << endl;
+    };
+    y = 2023;
+    if (object1.setYear(y) == 0) {
+        cerr << "" << y << " good" << endl;
+    }
+    else
+    {
+        cerr << "" << y << " failed" << endl;
+    };
+    y = 1981;
+    if (object1.setYear(y) == 0) {
+        cerr << "" << y << " good" << endl;
+    }
+    else
+    {
+        cerr << "" << y << " failed" << endl;
+    };
+    y = 2028;
+    if (object1.setYear(y) == 0) {
+        cerr << "" << y << " good" << endl;
+    }
+    else
+    {
+        cerr << "" << y << " failed" << endl;
+    };
+};
+
 int main()
 {
-    SetConsoleCP(1251);
-    SetConsoleOutputCP(1251);
-    //setlocale(LC_ALL, "Russian");
+
     book b;
     author a;
-    string name, surname, title, date, year;
 
-    cout << "Введите имя автора: ";
-    cin >> name;
-    b.setName(name);
-    a.setName(name);
+#ifdef testfunc
+    testingsetDate(a);
+    cerr << endl;
+    testingsetYear(b);
 
-    cout << "Введите фамилию автора: ";
-    cin >> surname;
-    b.setSurname(surname);
-    a.setSurname(surname);
+#endif // testfunc
 
-    cout << "Введите дату рождения автора: ";
-    cin >> date;
-    a.setDate(date);
-
-    cout << "Введите заглавие книги: ";
-    cin >> title;
-    a.setTitle(title);
-    b.setTitle(title);
-
-    cout << "Введите год выпуска книги: ";
-    cin >> year;
-    b.setYear(year);
-
-    cout << endl << "Имя автора: " << b.getName() << endl;
-    cout << "Фамилия авторя: " << b.getSurname() << endl;
-    cout << "Дата рождения автора: " << a.getDate() << endl;
-    cout << "Заглавие книги: " << b.getTitle() << endl;
-    cout << "Дата выпуска книги: " << b.getYear() << endl;
 
     return 0;
 }
